@@ -2,94 +2,67 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neural Network Core</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Neural Network Core — 3D Intelligence</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#03050a;color:#dffcff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}canvas{display:block}
-#hud{position:fixed;inset:0;pointer-events:none;padding:20px}
-#brand{position:absolute;left:22px;top:18px}.eyebrow{font-size:10px;letter-spacing:3px;color:#72f7ff;text-transform:uppercase;opacity:.75}.title{font-size:22px;font-weight:700;letter-spacing:1px;text-shadow:0 0 18px rgba(0,238,255,.55)}
-#stats{position:absolute;right:20px;top:18px;min-width:180px;padding:12px 14px;border:1px solid rgba(100,240,255,.18);background:rgba(3,10,18,.62);backdrop-filter:blur(12px);border-radius:12px;font:11px/1.8 ui-monospace,SFMono-Regular,monospace;color:#9edbe0}.stat{display:flex;justify-content:space-between;gap:20px}.value{color:#fff}
-#controls{pointer-events:auto;position:absolute;left:20px;bottom:20px;width:min(330px,calc(100vw - 40px));padding:15px;border:1px solid rgba(100,240,255,.18);background:rgba(3,10,18,.72);backdrop-filter:blur(14px);border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:9px 0;font-size:12px;color:#a7c7ca}.row span{min-width:55px;text-align:right;color:#72f7ff;font-family:monospace}input[type=range]{width:145px;accent-color:#00eaff}button{border:1px solid rgba(0,238,255,.35);background:rgba(0,238,255,.08);color:#cfffff;border-radius:8px;padding:8px 10px;cursor:pointer;font-size:11px}button:hover{background:rgba(0,238,255,.16)}
-#hint{position:absolute;right:20px;bottom:22px;color:#55777b;font:10px ui-monospace,monospace;text-align:right;line-height:1.7}.pulse{color:#ff6cf5}.online{color:#61ffad}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020308;color:#dffcff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}canvas{display:block}
+#hud{position:fixed;inset:0;pointer-events:none;padding:22px}.glass{border:1px solid rgba(130,240,255,.16);background:linear-gradient(135deg,rgba(8,17,28,.78),rgba(3,7,14,.54));backdrop-filter:blur(18px);box-shadow:0 18px 60px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.035);border-radius:16px}
+#brand{position:absolute;left:22px;top:20px}.eyebrow{font-size:9px;letter-spacing:3px;color:#72f7ff;text-transform:uppercase;opacity:.72}.title{font-size:23px;font-weight:750;letter-spacing:1.5px;text-shadow:0 0 24px rgba(0,238,255,.5)}.subtitle{margin-top:4px;font-size:10px;color:#62858c;letter-spacing:1px}
+#stats{position:absolute;right:22px;top:20px;width:205px;padding:14px 15px}.stat{display:flex;justify-content:space-between;gap:20px;margin:4px 0;font:10px/1.65 ui-monospace,SFMono-Regular,monospace;color:#78999f}.value{color:#e9ffff}.online{color:#6dffb1}.liveDot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#62ffb0;box-shadow:0 0 12px #62ffb0;margin-right:5px}
+#controls{pointer-events:auto;position:absolute;left:22px;bottom:22px;width:min(345px,calc(100vw - 44px));padding:16px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;font-size:11px;color:#9db9bd}.row span{min-width:55px;text-align:right;color:#73eaf2;font:10px ui-monospace,monospace}input[type=range]{width:155px;accent-color:#19dceb;filter:drop-shadow(0 0 5px rgba(25,220,235,.25))}button{border:1px solid rgba(45,229,242,.28);background:rgba(20,204,220,.06);color:#cfffff;border-radius:9px;padding:8px 10px;cursor:pointer;font-size:9px;letter-spacing:.8px;transition:.2s}button:hover{background:rgba(20,204,220,.15);border-color:rgba(45,229,242,.55);box-shadow:0 0 20px rgba(20,204,220,.12)}
+#hint{position:absolute;right:22px;bottom:22px;color:#4e6d73;font:9px/1.8 ui-monospace,monospace;text-align:right}.pulse{color:#f56bea}.badge{display:inline-flex;align-items:center;padding:4px 7px;border-radius:99px;background:rgba(91,255,194,.05);border:1px solid rgba(91,255,194,.14)}
+#scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.008) 0,rgba(255,255,255,.008) 1px,transparent 1px,transparent 4px);mix-blend-mode:screen;opacity:.25}
+@media(max-width:700px){#stats{width:175px}.title{font-size:17px}#hint{display:none}.glass{border-radius:13px}}
 </style>
 </head>
 <body>
 <div id="hud">
-  <div id="brand"><div class="eyebrow">Artificial Intelligence / Visualization</div><div class="title">NEURAL NETWORK CORE</div></div>
-  <div id="stats">
-    <div class="stat"><span>STATUS</span><b class="online value">ONLINE</b></div>
-    <div class="stat"><span>LAYERS</span><b id="layerStat" class="value">5</b></div>
-    <div class="stat"><span>NEURONS</span><b id="neuronStat" class="value">33</b></div>
-    <div class="stat"><span>CONNECTIONS</span><b id="edgeStat" class="value">208</b></div>
-    <div class="stat"><span>FPS</span><b id="fpsStat" class="value">60</b></div>
-  </div>
-  <div id="controls">
-    <div class="eyebrow">LIVE PARAMETERS</div>
-    <div class="row"><label>Network size</label><input id="size" type="range" min="3" max="9" value="5"><span id="sizeOut">5 layers</span></div>
-    <div class="row"><label>Activity</label><input id="activity" type="range" min="0" max="100" value="65"><span id="activityOut">65%</span></div>
-    <div class="row"><label>Rotation</label><input id="rotation" type="range" min="0" max="100" value="35"><span id="rotationOut">0.35x</span></div>
-    <div class="row"><button id="pulseBtn">SEND SIGNAL</button><button id="resetBtn">RESET VIEW</button><button id="pauseBtn">PAUSE</button></div>
-  </div>
-  <div id="hint">DRAG / MOVE MOUSE TO INTERACT<br><span class="pulse">● SIGNAL FLOW ACTIVE</span></div>
-</div>
+ <div id="brand"><div class="eyebrow">Artificial Intelligence / 3D Simulation</div><div class="title">NEURAL NETWORK CORE</div><div class="subtitle">BIO-INSPIRED COMPUTATIONAL FIELD</div></div>
+ <div id="stats" class="glass">
+  <div class="stat"><span>CORE</span><b class="online value"><span class="liveDot"></span>ONLINE</b></div>
+  <div class="stat"><span>LAYERS</span><b id="layerStat" class="value">5</b></div>
+  <div class="stat"><span>NEURONS</span><b id="neuronStat" class="value">33</b></div>
+  <div class="stat"><span>SYNAPSES</span><b id="edgeStat" class="value">208</b></div>
+  <div class="stat"><span>ACTIVITY</span><b id="activityStat" class="value">65%</b></div>
+  <div class="stat"><span>FPS</span><b id="fpsStat" class="value">60</b></div>
+ </div>
+ <div id="controls" class="glass">
+  <div class="eyebrow">LIVE PARAMETERS</div>
+  <div class="row"><label>Network depth</label><input id="size" type="range" min="3" max="9" value="5"><span id="sizeOut">5 layers</span></div>
+  <div class="row"><label>Neural activity</label><input id="activity" type="range" min="0" max="100" value="65"><span id="activityOut">65%</span></div>
+  <div class="row"><label>Field rotation</label><input id="rotation" type="range" min="0" max="100" value="35"><span id="rotationOut">0.35x</span></div>
+  <div class="row"><button id="pulseBtn">⚡ SEND SIGNAL</button><button id="resetBtn">RESET VIEW</button><button id="pauseBtn">PAUSE</button></div>
+ </div>
+ <div id="hint"><span class="badge"><span class="pulse">●</span>&nbsp; SYNAPTIC FLOW</span><br>MOVE POINTER TO ORBIT THE FIELD<br>SCROLL TO CHANGE DEPTH</div>
+</div><div id="scan"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const scene=new THREE.Scene();
-scene.fog=new THREE.FogExp2(0x03050a,.012);
-const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,1000);camera.position.set(0,1,46);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputEncoding=THREE.sRGBEncoding;document.body.appendChild(renderer.domElement);
-
-const network=new THREE.Group();scene.add(network);
-const layersBase=[4,8,10,8,3];let layerCount=5, activity=.65, rotation=.35, paused=false;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x020308);scene.fog=new THREE.FogExp2(0x02050b,.009);
+const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1200);camera.position.set(0,1,48);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;document.body.appendChild(renderer.domElement);
+const ambient=new THREE.HemisphereLight(0x183a55,0x020207,1.2);scene.add(ambient);const key=new THREE.PointLight(0x00eaff,22,90);key.position.set(0,12,18);scene.add(key);const rim=new THREE.PointLight(0xff35df,18,75);rim.position.set(0,-12,-18);scene.add(rim);
+const network=new THREE.Group();scene.add(network);const layersBase=[4,8,10,8,3];let layerCount=5,activity=.65,rotation=.35,paused=false;
 let nodes=[],edges=[],signals=[],clock=new THREE.Clock(),last=performance.now(),frames=0;
-const nodeGeo=new THREE.SphereGeometry(.55,18,18);const nodeMat=new THREE.MeshBasicMaterial({color:0x00eaff});
-const activeMat=new THREE.MeshBasicMaterial({color:0xff4eea});
-const edgeMat=new THREE.LineBasicMaterial({color:0x8a35ff,transparent:true,opacity:.16});
-const signalGeo=new THREE.SphereGeometry(.12,8,8);const signalMat=new THREE.MeshBasicMaterial({color:0xffffff});
-
+const nodeGeo=new THREE.SphereGeometry(.47,20,20),coreGeo=new THREE.SphereGeometry(.21,12,12);
+const edgeBase=new THREE.LineBasicMaterial({color:0x3d6b92,transparent:true,opacity:.12});
+const signalGeo=new THREE.SphereGeometry(.10,10,10);const signalMat=new THREE.MeshBasicMaterial({color:0xffffff});
+const glowTexture=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.16,'rgba(0,240,255,.8)');g.addColorStop(.45,'rgba(0,180,255,.22)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)})();
 function clearNetwork(){while(network.children.length)network.remove(network.children[0]);nodes=[];edges=[];signals=[]}
-function makeCounts(n){
-  if(n===5)return layersBase.slice();
-  const a=[];for(let i=0;i<n;i++){const t=i/(n-1);a.push(Math.max(3,Math.round(4+7*Math.sin(Math.PI*t))));}return a;
-}
-function buildNetwork(){
-  clearNetwork();const counts=makeCounts(layerCount),gap=10.5,spacing=3.0;
-  const layers=[];
-  counts.forEach((count,i)=>{const layer=[];const x=(i-(counts.length-1)/2)*gap;
-    for(let j=0;j<count;j++){const y=(j-(count-1)/2)*spacing;const z=(Math.random()-.5)*4;
-      const m=nodeMat.clone();const node=new THREE.Mesh(nodeGeo,m);node.position.set(x,y,z);node.userData={baseY:y,phase:Math.random()*Math.PI*2,power:Math.random()};network.add(node);layer.push(node);nodes.push(node);
-    }layers.push(layer);
-  });
-  for(let i=0;i<layers.length-1;i++)for(const a of layers[i])for(const b of layers[i+1]){
-    const g=new THREE.BufferGeometry().setFromPoints([a.position,b.position]);const line=new THREE.Line(g,edgeMat.clone());line.userData={a,b,phase:Math.random()*Math.PI*2};network.add(line);edges.push(line);
-  }
-  document.getElementById('layerStat').textContent=counts.length;document.getElementById('neuronStat').textContent=nodes.length;document.getElementById('edgeStat').textContent=edges.length;
-}
-
-function sendSignal(){for(let i=0;i<Math.min(10,Math.floor(nodes.length/3));i++){const from=nodes[Math.floor(Math.random()*nodes.length)];const to=nodes[Math.floor(Math.random()*nodes.length)];const s=new THREE.Mesh(signalGeo,signalMat);s.userData={from,to,t:0,d:.7+Math.random()*.8};s.position.copy(from.position);network.add(s);signals.push(s)}}
-function updateSignals(dt){for(let i=signals.length-1;i>=0;i--){const s=signals[i];s.userData.t+=dt/s.userData.d;const t=s.userData.t;if(t>=1){network.remove(s);signals.splice(i,1);continue}s.position.lerpVectors(s.userData.from.position,s.userData.to.position,t)}}
-function update(){const t=clock.getElapsedTime();network.rotation.y+=.0015*rotation;network.rotation.x=Math.sin(t*.16)*.06;
-  nodes.forEach(n=>{n.position.y=n.userData.baseY+Math.sin(t*(.8+activity*1.5)+n.userData.phase)*(.12+activity*.28);const active=(Math.sin(t*2.2+n.userData.phase)>.72-activity*.7);n.material.color.set(active?0xff4eea:0x00eaff);n.scale.setScalar(active?1.18:1)});
-  edges.forEach(e=>{e.material.opacity=.08+activity*.18+Math.max(0,Math.sin(t*1.7+e.userData.phase))*.05;e.geometry.setFromPoints([e.userData.a.position,e.userData.b.position])});
-  updateSignals(.016);
-}
-
-const particles=new THREE.BufferGeometry(),pc=900,pa=new Float32Array(pc*3);for(let i=0;i<pa.length;i++)pa[i]=(Math.random()-.5)*180;particles.setAttribute('position',new THREE.BufferAttribute(pa,3));const pmat=new THREE.PointsMaterial({color:0x54dfff,size:.075,transparent:true,opacity:.42});const stars=new THREE.Points(particles,pmat);scene.add(stars);
-
-buildNetwork();
-
-document.getElementById('size').oninput=e=>{layerCount=+e.target.value;document.getElementById('sizeOut').textContent=layerCount+' layers';buildNetwork()};
-document.getElementById('activity').oninput=e=>{activity=+e.target.value/100;document.getElementById('activityOut').textContent=e.target.value+'%'};
-document.getElementById('rotation').oninput=e=>{rotation=+e.target.value/100;document.getElementById('rotationOut').textContent=rotation.toFixed(2)+'x'};
-document.getElementById('pulseBtn').onclick=sendSignal;
-document.getElementById('pauseBtn').onclick=e=>{paused=!paused;e.target.textContent=paused?'RESUME':'PAUSE'};
-document.getElementById('resetBtn').onclick=()=>{camera.position.set(0,1,46);network.rotation.set(0,0,0)};
-let mx=0,my=0;addEventListener('pointermove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2});
-addEventListener('wheel',e=>{camera.position.z=THREE.MathUtils.clamp(camera.position.z+e.deltaY*.025,22,80)});
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2))});
-function animate(){requestAnimationFrame(animate);if(!paused){update();camera.position.x+=(mx*4-camera.position.x)*.025;camera.position.y+=(-my*3+1-camera.position.y)*.025;stars.rotation.y+=.00015;renderer.render(scene,camera)}frames++;const now=performance.now();if(now-last>500){document.getElementById('fpsStat').textContent=Math.round(frames*1000/(now-last));frames=0;last=now}}
-animate();
+function makeCounts(n){if(n===5)return layersBase.slice();const a=[];for(let i=0;i<n;i++){const t=i/(n-1);a.push(Math.max(3,Math.round(4+7*Math.sin(Math.PI*t))))}return a}
+function makeNode(x,y,z,phase){const group=new THREE.Group();group.position.set(x,y,z);const mat=new THREE.MeshStandardMaterial({color:0x22dceb,emissive:0x008fa4,emissiveIntensity:.8,roughness:.28,metalness:.3});const core=new THREE.Mesh(nodeGeo,mat);group.add(core);const inner=new THREE.Mesh(coreGeo,new THREE.MeshBasicMaterial({color:0xeaffff}));group.add(inner);const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture,color:0x00eaff,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false}));glow.scale.set(2.7,2.7,2.7);group.add(glow);group.userData={baseY:y,phase,power:Math.random(),core,glow};network.add(group);nodes.push(group);return group}
+function buildNetwork(){clearNetwork();const counts=makeCounts(layerCount),gap=Math.min(9.2,48/(counts.length-1)),spacing=2.75,layers=[];
+ counts.forEach((count,i)=>{const layer=[],x=(i-(counts.length-1)/2)*gap;for(let j=0;j<count;j++){const y=(j-(count-1)/2)*spacing;const z=(Math.random()-.5)*3.8;layer.push(makeNode(x,y,z,Math.random()*Math.PI*2))}layers.push(layer)});
+ for(let i=0;i<layers.length-1;i++)for(const a of layers[i])for(const b of layers[i+1]){const pos=new Float32Array(6);const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));const line=new THREE.Line(geo,edgeBase.clone());line.userData={a,b,phase:Math.random()*6.28,weight:.15+Math.random()*.85};network.add(line);edges.push(line)}
+ document.getElementById('layerStat').textContent=counts.length;document.getElementById('neuronStat').textContent=nodes.length;document.getElementById('edgeStat').textContent=edges.length}
+function sendSignal(){const count=Math.min(18,Math.max(6,Math.floor(nodes.length/2)));for(let i=0;i<count;i++){const from=nodes[Math.floor(Math.random()*nodes.length)],to=nodes[Math.floor(Math.random()*nodes.length)],s=new THREE.Mesh(signalGeo,signalMat.clone());s.userData={from,to,t:0,d:.55+Math.random()*.8};s.position.copy(from.position);network.add(s);signals.push(s)}}
+function updateSignals(dt){for(let i=signals.length-1;i>=0;i--){const s=signals[i];s.userData.t+=dt/s.userData.d;const t=s.userData.t;if(t>=1){network.remove(s);signals.splice(i,1);continue}s.position.lerpVectors(s.userData.from.position,s.userData.to.position,t);s.material.color.setHSL(.5+.15*Math.sin(t*8),1,Math.min(1,.72+activity*.2))}}
+function update(dt){const t=clock.getElapsedTime();network.rotation.y+=dt*.12*rotation;network.rotation.x=Math.sin(t*.17)*.045;
+ nodes.forEach(n=>{const pulse=(Math.sin(t*(1.2+activity*3)+n.userData.phase)+1)/2;const active=pulse>.68-activity*.25;n.position.y=n.userData.baseY+Math.sin(t*(.7+activity*1.4)+n.userData.phase)*(.08+activity*.25);n.userData.core.material.emissiveIntensity=.65+pulse*2.2*activity;n.userData.core.material.color.set(active?0x28f4ff:0x168ea5);n.userData.glow.material.color.set(active?0xff4eea:0x00eaff);n.userData.glow.material.opacity=.22+pulse*.55;n.userData.glow.scale.setScalar(2.2+pulse*1.4);n.scale.setScalar(1+pulse*.12*activity)});
+ edges.forEach(e=>{const p=e.geometry.attributes.position.array;const a=e.userData.a.position,b=e.userData.b.position;p[0]=a.x;p[1]=a.y;p[2]=a.z;p[3]=b.x;p[4]=b.y;p[5]=b.z;e.geometry.attributes.position.needsUpdate=true;const wave=(Math.sin(t*2+e.userData.phase)+1)/2;e.material.opacity=.045+activity*(.07+wave*.12)*e.userData.weight;e.material.color.set(wave>.72?0xd03bff:0x2d83aa)});updateSignals(dt)}
+const particles=new THREE.BufferGeometry(),pc=1400,pa=new Float32Array(pc*3);for(let i=0;i<pa.length;i++)pa[i]=(Math.random()-.5)*190;particles.setAttribute('position',new THREE.BufferAttribute(pa,3));const pmat=new THREE.PointsMaterial({color:0x4bcde2,size:.065,transparent:true,opacity:.34,depthWrite:false});const stars=new THREE.Points(particles,pmat);scene.add(stars);
+const halo=new THREE.Mesh(new THREE.SphereGeometry(34,32,32),new THREE.MeshBasicMaterial({color:0x031521,transparent:true,opacity:.12,side:THREE.BackSide,blending:THREE.AdditiveBlending}));scene.add(halo);buildNetwork();
+document.getElementById('size').oninput=e=>{layerCount=+e.target.value;document.getElementById('sizeOut').textContent=layerCount+' layers';buildNetwork()};document.getElementById('activity').oninput=e=>{activity=+e.target.value/100;document.getElementById('activityOut').textContent=e.target.value+'%';document.getElementById('activityStat').textContent=e.target.value+'%'};document.getElementById('rotation').oninput=e=>{rotation=+e.target.value/100;document.getElementById('rotationOut').textContent=rotation.toFixed(2)+'x'};document.getElementById('pulseBtn').onclick=sendSignal;document.getElementById('pauseBtn').onclick=e=>{paused=!paused;e.target.textContent=paused?'RESUME':'PAUSE'};document.getElementById('resetBtn').onclick=()=>{camera.position.set(0,1,48);network.rotation.set(0,0,0);sendSignal()};
+let mx=0,my=0;addEventListener('pointermove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2});addEventListener('wheel',e=>{camera.position.z=THREE.MathUtils.clamp(camera.position.z+e.deltaY*.022,20,82)});addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2))});
+function animate(){requestAnimationFrame(animate);const now=performance.now();if(!paused){const dt=Math.min(clock.getDelta(),.04);update(dt);camera.position.x+=(mx*5.5-camera.position.x)*.018;camera.position.y+=(-my*3.5+1-camera.position.y)*.018;stars.rotation.y+=dt*.008;halo.rotation.y-=dt*.015;renderer.render(scene,camera)}else{renderer.render(scene,camera)}frames++;if(now-last>500){document.getElementById('fpsStat').textContent=Math.round(frames*1000/(now-last));frames=0;last=now}}animate();
 </script>
-</body>
-</html>
+</body></html>
